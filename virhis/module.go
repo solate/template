@@ -5,6 +5,7 @@ import (
 	"github.com/solate/generation"
 	"github.com/solate/generation/model"
 	"github.com/solate/generation/utils"
+	"strings"
 )
 
 func GetModuleParams(mds []model.MarkDown) (params map[string][]interface{}, err error) {
@@ -41,9 +42,11 @@ func GetModuleParams(mds []model.MarkDown) (params map[string][]interface{}, err
 				GetListBody(fileName, generation.GetTemplateReplyBody(md.Response)),
 				note,
 				structName,
+				methodName,
 				methodReq,
 				methodReply,
-				GetCodeBody(fileName, methodReq, methodReply),
+				//" //TODO 代码",
+				GetCodeListBody(fileName, md.Request),
 			}
 
 		} else {
@@ -56,9 +59,11 @@ func GetModuleParams(mds []model.MarkDown) (params map[string][]interface{}, err
 				generation.GetTemplateReplyBody(md.Response),
 				note,
 				structName,
+				methodName,
 				methodReq,
 				methodReply,
-				GetCodeBody(fileName, methodReq, methodReply),
+				//" //TODO 代码",
+				GetCodeBody(fileName, md.Request, md.Response),
 			}
 		}
 
@@ -81,16 +86,27 @@ func GetListBody(structName string, body string) string {
 	return fmt.Sprintf(TemplateList, structName, structName, body)
 }
 
-func GetCodeBody(fileName, methodReq, methodReply string) string {
+func GetCodeListBody(fileName string, reqs []model.MarkDownReqTable) string {
 
-	file, err := utils.ReadFile("./template/module_body.tpl")
+	methodReq := fileName + "Req"
+	methodReply := fileName + "Reply"
+
+	file, err := utils.ReadFile("./template/module_body_list.tpl")
 	if err != nil {
 		fmt.Println(err)
 	}
 
+	var tmp []string
+	for _, v := range reqs {
+		var str = fmt.Sprintf("%s : req.%s,", v.Name, v.Name)
+		tmp = append(tmp, str)
+	}
+	reqStr := strings.Join(tmp, "\n")
+
 	return fmt.Sprintf(file,
 		utils.Lcfirst(methodReq),
 		methodReq,
+		reqStr,
 		utils.Lcfirst(methodReply),
 		methodReply,
 		fileName,
@@ -101,5 +117,42 @@ func GetCodeBody(fileName, methodReq, methodReply string) string {
 		utils.Lcfirst(methodReply),
 		utils.Lcfirst(methodReply),
 		fileName,
+	)
+}
+
+func GetCodeBody(fileName string, reqs []model.MarkDownReqTable, replys []model.MarkDownReplyTable) string {
+	methodReq := fileName + "Req"
+	methodReply := fileName + "Reply"
+
+	file, err := utils.ReadFile("./template/module_body.tpl")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var reqTmp []string
+	for _, v := range reqs {
+		var str = fmt.Sprintf("%s : req.%s,", v.Name, v.Name)
+		reqTmp = append(reqTmp, str)
+	}
+	reqStr := strings.Join(reqTmp, "\n")
+
+	var tmp []string
+	for _, v := range replys {
+		var str = fmt.Sprintf("reply.%s = %s.%s", v.Name, utils.Lcfirst(methodReply), v.Name)
+		tmp = append(tmp, str)
+	}
+	replyStr := strings.Join(tmp, "\n")
+
+	return fmt.Sprintf(file,
+		utils.Lcfirst(methodReq),
+		methodReq,
+		reqStr,
+		utils.Lcfirst(methodReply),
+		methodReply,
+		fileName,
+		utils.Lcfirst(methodReq),
+		utils.Lcfirst(methodReply),
+		fileName,
+		replyStr,
 	)
 }

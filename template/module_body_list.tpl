@@ -1,7 +1,6 @@
 
 
-
-  //TODO 代码
+    //TODO 代码
     %s := &virhis.%s{
         %s
     }
@@ -12,6 +11,11 @@
         moduleman.NewError(std.AdminCodeServerError, err.Error())
     }
 
+    list := make([]%s, 0, len(%s.List))
+    for _, v := range %s.List {
+        list = append(list, %s{
+            //TODO 属性
+        })
+    }
 
-
-    %s
+    reply.List = list

@@ -14,7 +14,7 @@ type %s struct {
 }
 
 //%s
-func (*%s) GetOutpatientReportList(c *moduleman.Context, req *%s, reply *%s) *moduleman.Error {
+func (*%s) %s(c *moduleman.Context, req *%s, reply *%s) *moduleman.Error {
 
 	%s
 
