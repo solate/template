@@ -46,7 +46,7 @@ func GetModuleParams(mds []model.MarkDown) (params map[string][]interface{}, err
 				methodReq,
 				methodReply,
 				//" //TODO 代码",
-				GetCodeListBody(fileName, md.Request),
+				GetCodeListBody(fileName, md.Request, md.Response),
 			}
 
 		} else {
@@ -86,7 +86,7 @@ func GetListBody(structName string, body string) string {
 	return fmt.Sprintf(TemplateList, structName, structName, body)
 }
 
-func GetCodeListBody(fileName string, reqs []model.MarkDownReqTable) string {
+func GetCodeListBody(fileName string, reqs []model.MarkDownReqTable, replys []model.MarkDownReplyTable) string {
 
 	methodReq := fileName + "Req"
 	methodReply := fileName + "Reply"
@@ -103,6 +103,13 @@ func GetCodeListBody(fileName string, reqs []model.MarkDownReqTable) string {
 	}
 	reqStr := strings.Join(tmp, "\n")
 
+	var replyTmp []string
+	for _, v := range replys {
+		var str = fmt.Sprintf("%s: v.%s,", v.Name, v.Name)
+		replyTmp = append(replyTmp, str)
+	}
+	replyStr := strings.Join(replyTmp, "\n")
+
 	return fmt.Sprintf(file,
 		utils.Lcfirst(methodReq),
 		methodReq,
@@ -113,10 +120,11 @@ func GetCodeListBody(fileName string, reqs []model.MarkDownReqTable) string {
 		utils.Lcfirst(methodReq),
 		utils.Lcfirst(methodReply),
 		fileName,
-		utils.Lcfirst(methodReply),
+		fileName,
 		utils.Lcfirst(methodReply),
 		utils.Lcfirst(methodReply),
 		fileName,
+		replyStr,
 	)
 }
 
