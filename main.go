@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/solate/generation"
-	"gitlab.dev.okapp.cc/med-his-group/Template/virhis"
+	"github.com/solate/template/virhis"
 	"log"
 )
 
